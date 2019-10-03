@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         buttonScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                scanWifi();
 
             }
         });
@@ -46,40 +47,47 @@ public class MainActivity extends AppCompatActivity {
         listView = findViewById(R.id.wifiList);
         mainWifiObj = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
+        //makes sure Wifi is enabled
         if (!mainWifiObj.isWifiEnabled()) {
             Toast.makeText(this,  "WiFi is disabled ... we need to enable it", Toast.LENGTH_LONG).show();
             mainWifiObj.setWifiEnabled(true);
         }
 
+        //store the array list into a list view
         adapter = new ArrayAdapter<>( this, android.R.layout.simple_list_item_1, arrayList);
         listView.setAdapter(adapter);
+
+        //starts the class scanWifi()
         scanWifi();
-/*
-        boolean success = mainWifiObj.startScan();
-        if (success) {
-            scanSuccess();
-        }
-        else{
-            // scan failure handling
-            scanFailure();
-        }
-        */
     }
+        //initialises array list, check if scan is available, starts scan and check if its successful
         private void scanWifi(){
             arrayList.clear();
             registerReceiver(wifiReceiver, new IntentFilter(mainWifiObj.SCAN_RESULTS_AVAILABLE_ACTION));
-            mainWifiObj.startScan();
+            boolean success = mainWifiObj.startScan();
             Toast.makeText( this, "Scanning WiFi ...", Toast.LENGTH_SHORT).show();
+            if (success) {
+                //scanSuccess();
+            }
+            else{
+                // scan failure handling
+                //scanFailure();
+            }
         }
 
+        //sends broadcasts to see if scan is available
         BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent)  {
+            //get scan results
             results = mainWifiObj.getScanResults();
+            //unregisters receiver
             unregisterReceiver(this);
 
+            //stores results in array list then sends to adapter
             for (ScanResult scanResult : results) {
                 arrayList.add(scanResult.SSID);
+                arrayList.add(String.valueOf(scanResult.level));
                 adapter.notifyDataSetChanged();
             }
         }
