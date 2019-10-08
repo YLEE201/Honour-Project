@@ -7,8 +7,9 @@ import android.content.Context;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 import android.os.Bundle;
@@ -26,10 +27,10 @@ public class MainActivity extends AppCompatActivity {
     private  WifiManager mainWifiObj;
     private ListView listView;
     private Button buttonScan;
-    private int size = 0;
     private List<ScanResult> results;
     private ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,20 +85,32 @@ public class MainActivity extends AppCompatActivity {
             //unregisters receiver
             unregisterReceiver(this);
 
-
             //stores results in array list then sends to adapter
             for (ScanResult scanResult : results) {
-                arrayList.add(scanResult.SSID);
-                arrayList.add(String.valueOf(scanResult.level));
-                WifiInfo wifiInfo = mainWifiObj.getConnectionInfo();
-                int frequency = wifiInfo.getFrequency();
-                arrayList.add(String.valueOf(frequency));
-                double distance = calculateDistance(scanResult.level, frequency);
-                arrayList.add(String.valueOf(distance));
+                //wifi name
+                arrayList.add("SSID: " + scanResult.SSID);
+
+                //Signal strength
+                String dbm = String.valueOf(scanResult.level);
+                arrayList.add("dbm: " + dbm);
+
+
+                //WifiInfo wifiInfo = mainWifiObj.getConnectionInfo();
+                //int frequency = wifiInfo.getFrequency();
+                //arrayList.add(String.valueOf(frequency));
+
+                //frequency
+                arrayList.add("frequency: " + scanResult.frequency +"MHZ");
+
+                //Distance
+                double distance = calculateDistance(scanResult.level, scanResult.frequency);
+                String Sdistance = String.valueOf(distance);
+                arrayList.add("Router is " + Sdistance + "m");
                 adapter.notifyDataSetChanged();
             }
         }
     };
+    //Distance formula
     public double calculateDistance(double signalLevelInDb, double freqInMHz) {
         double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(signalLevelInDb)) / 20.0;
         return Math.pow(10.0, exp);
