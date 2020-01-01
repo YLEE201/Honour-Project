@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.Manifest;
 
 import android.os.Bundle;
 import android.view.View;
@@ -22,20 +23,28 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
+
 public class MainActivity extends AppCompatActivity {
 
-    private  WifiManager mainWifiObj;
+    private WifiManager mainWifiObj;
     private ListView listView;
     private Button buttonScan;
     private List<ScanResult> results;
     private ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter adapter;
+    private final int REQUEST_LOCATION_PERMISSION = 1;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //permission check
+        requestLocationPermission();
+
         buttonScan = findViewById(R.id.scanBtn);
         buttonScan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //instantiates variables
         listView = findViewById(R.id.wifiList);
         mainWifiObj = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
@@ -115,6 +125,27 @@ public class MainActivity extends AppCompatActivity {
         double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(signalLevelInDb)) / 20.0;
         return Math.pow(10.0, exp);
     }
+
+    //Permissions code - uses the EasyPermissions from google - dependency in gradle.app
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
+    public void requestLocationPermission() {
+        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
+        if(EasyPermissions.hasPermissions(this, perms)) {
+            Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
+        }
+    }
+
  /*
     private void scanSuccess() {
         WifiManager mainWifiObj;
