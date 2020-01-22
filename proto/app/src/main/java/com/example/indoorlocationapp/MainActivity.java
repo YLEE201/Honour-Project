@@ -13,12 +13,17 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.Manifest;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private WifiManager mainWifiObj;
     private ListView listView;
     private Button buttonScan;
+    private Button buttonsend;
     private List<ScanResult> results;
     private ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter adapter;
@@ -53,6 +59,16 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        buttonsend = findViewById(R.id.sendBtn);
+        buttonsend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openjsonpage();
+
+            }
+        });
+
 
         //instantiates variables
         listView = findViewById(R.id.wifiList);
@@ -100,6 +116,10 @@ public class MainActivity extends AppCompatActivity {
                 //wifi name
                 arrayList.add("SSID: " + scanResult.SSID);
 
+                //wifi identifier
+                arrayList.add("BSSID: " + scanResult.BSSID);
+                final String bssid = scanResult.BSSID;
+
                 //Signal strength
                 String dbm = String.valueOf(scanResult.level);
                 arrayList.add("dbm: " + dbm);
@@ -117,6 +137,11 @@ public class MainActivity extends AppCompatActivity {
                 String Sdistance = String.valueOf(distance);
                 arrayList.add("Router is " + Sdistance + "m");
                 adapter.notifyDataSetChanged();
+
+
+
+
+
             }
         }
     };
@@ -145,7 +170,10 @@ public class MainActivity extends AppCompatActivity {
             EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
         }
     }
-
+    public void openjsonpage(){
+        Intent intent = new Intent(this, jsonpage.class);
+        startActivity(intent);
+    }
  /*
     private void scanSuccess() {
         WifiManager mainWifiObj;
