@@ -2,6 +2,7 @@ package com.example.indoorlocationapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.sip.SipSession;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.Manifest;
@@ -40,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private List<ScanResult> results;
     private ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter adapter;
+    private ArrayList<String> bssid = new ArrayList<>();
+    private ArrayList<String> SignalStrength = new ArrayList<>();
     private final int REQUEST_LOCATION_PERMISSION = 1;
-
+    private LocationListener Listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         //initialises array list, check if scan is available, starts scan and check if its successful
         private void scanWifi(){
             arrayList.clear();
+            bssid.clear();
             registerReceiver(wifiReceiver, new IntentFilter(mainWifiObj.SCAN_RESULTS_AVAILABLE_ACTION));
             boolean success = mainWifiObj.startScan();
             Toast.makeText( this, "Scanning WiFi ...", Toast.LENGTH_SHORT).show();
@@ -104,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         //sends broadcasts to see if scan is available
         BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onReceive(Context context, Intent intent)  {
             //get scan results
@@ -118,12 +124,12 @@ public class MainActivity extends AppCompatActivity {
 
                 //wifi identifier
                 arrayList.add("BSSID: " + scanResult.BSSID);
-                final String bssid = scanResult.BSSID;
+                bssid.add(scanResult.BSSID);
 
                 //Signal strength
                 String dbm = String.valueOf(scanResult.level);
                 arrayList.add("dbm: " + dbm);
-
+                SignalStrength.add(dbm);
 
                 //WifiInfo wifiInfo = mainWifiObj.getConnectionInfo();
                 //int frequency = wifiInfo.getFrequency();
@@ -137,9 +143,6 @@ public class MainActivity extends AppCompatActivity {
                 String Sdistance = String.valueOf(distance);
                 arrayList.add("Router is " + Sdistance + "m");
                 adapter.notifyDataSetChanged();
-
-
-
 
 
             }
@@ -172,6 +175,8 @@ public class MainActivity extends AppCompatActivity {
     }
     public void openjsonpage(){
         Intent intent = new Intent(this, jsonpage.class);
+        intent.putExtra("bssid_id", bssid);
+        intent.putExtra("ss_id", SignalStrength);
         startActivity(intent);
     }
  /*
