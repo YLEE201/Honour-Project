@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">IndoorLocationapp</string>
+    <string name="title_activity_open_trilat">openTrilat</string>
+    <string name="calculate">Calculate</string>
+    <string name="a">a</string>
+    <string name="b">b</string>
+    <string name="c">c</string>
+    <string name="d">d</string>
 </resources>

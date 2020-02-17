@@ -42,8 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private List<ScanResult> results;
     private ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter adapter;
+    private ArrayList<String> ssid = new ArrayList<>();
     private ArrayList<String> bssid = new ArrayList<>();
-    private ArrayList<String> SignalStrength = new ArrayList<>();
+    private ArrayList<String> SignalDistance = new ArrayList<>();
     private final int REQUEST_LOCATION_PERMISSION = 1;
     private LocationListener Listener;
 
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
             for (ScanResult scanResult : results) {
                 //wifi name
                 arrayList.add("SSID: " + scanResult.SSID);
+                ssid.add(scanResult.SSID);
 
                 //wifi identifier
                 arrayList.add("BSSID: " + scanResult.BSSID);
@@ -129,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 //Signal strength
                 String dbm = String.valueOf(scanResult.level);
                 arrayList.add("dbm: " + dbm);
-                SignalStrength.add(dbm);
 
                 //WifiInfo wifiInfo = mainWifiObj.getConnectionInfo();
                 //int frequency = wifiInfo.getFrequency();
@@ -142,6 +143,8 @@ public class MainActivity extends AppCompatActivity {
                 double distance = calculateDistance(scanResult.level, scanResult.frequency);
                 String Sdistance = String.valueOf(distance);
                 arrayList.add("Router is " + Sdistance + "m");
+                SignalDistance.add(Sdistance);
+
                 adapter.notifyDataSetChanged();
 
 
@@ -176,7 +179,8 @@ public class MainActivity extends AppCompatActivity {
     public void openjsonpage(){
         Intent intent = new Intent(this, jsonpage.class);
         intent.putExtra("bssid_id", bssid);
-        intent.putExtra("ss_id", SignalStrength);
+        intent.putExtra("sd_id", SignalDistance);
+        intent.putExtra("ssid_id", ssid);
         startActivity(intent);
     }
  /*

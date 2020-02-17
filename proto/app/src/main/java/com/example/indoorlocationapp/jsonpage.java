@@ -26,6 +26,7 @@ import java.util.ArrayList;
 public class jsonpage extends AppCompatActivity {
     private Button buttonScan;
     private Button queryButton;
+    private Button User;
     private EditText macText1;
     private EditText macText2;
     private EditText macText3;
@@ -35,11 +36,11 @@ public class jsonpage extends AppCompatActivity {
     private TextView responseView1;
     private TextView responseView2;
     private TextView responseView3;
+    private ArrayList<String> ssid_id = new ArrayList<>();
     private ArrayList<String> bssid_id = new ArrayList<>();
-    private ArrayList<String> bssid_limit = new ArrayList<>();
-    private ArrayList<String> ss_id = new ArrayList<>();
-    private ArrayList<String> ss_limit = new ArrayList<>();
-    private ArrayList<String> bssid_ss = new ArrayList<>();
+    private ArrayList<String> sd_id = new ArrayList<>();
+    private ArrayList<String> lon = new ArrayList<>();
+    private ArrayList<String> lat = new ArrayList<>();
 
 
     @Override
@@ -49,6 +50,7 @@ public class jsonpage extends AppCompatActivity {
 
         buttonScan = findViewById(R.id.scanBtn);
         queryButton = findViewById(R.id.queryButton);
+        User = findViewById(R.id.user);
 
         progressBar1 = findViewById(R.id.progressBar1);
         progressBar2 = findViewById(R.id.progressBar2);
@@ -58,46 +60,14 @@ public class jsonpage extends AppCompatActivity {
         macText2 = findViewById(R.id.macText2);
         macText3 = findViewById(R.id.macText3);
 
+        //gets values from previous activity
+        ssid_id = getIntent().getStringArrayListExtra("ssid_id");
         bssid_id = getIntent().getStringArrayListExtra("bssid_id");
-        ss_id = getIntent().getStringArrayListExtra("ss_id");
+        sd_id = getIntent().getStringArrayListExtra("sd_id");
 
-        for (int i = 0; i < 3; i++) {
-
-            try {
-                bssid_limit.add(bssid_id.get(i));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        for (int i = 0; i < 3; i++) {
-
-            try {
-                ss_limit.add(ss_id.get(i));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-        for (int i = 0; i < 3; i++) { // Loop through every bssid/ss number combo
-            bssid_ss.add(bssid_limit.get(i) + "," + ss_limit.get(i)); // Concat the two, and add it
-        }
-
-            StringBuilder bssid = new StringBuilder();
-        for(String s : bssid_ss){
-            bssid.append(s + ";");
-        }
-
-        String listString = bssid.toString();
-
-        String mac1 = bssid_limit.get(0);
-        String mac2 = bssid_limit.get(1);
-        String mac3 = bssid_limit.get(2);
-
-        macText1.setText(mac1);
-        macText2.setText(mac2);
-        macText3.setText(mac3);
+        macText1.setText(bssid_id.get(0));
+        macText2.setText(bssid_id.get(1));
+        macText3.setText(bssid_id.get(2));
 
         responseView1 = findViewById(R.id.responseView1);
         responseView2 = findViewById(R.id.responseView2);
@@ -111,6 +81,16 @@ public class jsonpage extends AppCompatActivity {
             }
         });
 
+        User.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openTrilat();
+
+            }
+        });
+        ArrayList<String> lon = null;
+        ArrayList<String> lat = null;
+
         queryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,7 +103,7 @@ public class jsonpage extends AppCompatActivity {
     }
     private class RetrieveFeedTask1 extends AsyncTask<Void, Void, String> {
         private Exception exception;
-        String mac1;
+        String mac1 = bssid_id.get(0);
 
         protected void onPreExecute() {
             progressBar1.setVisibility(View.VISIBLE);
@@ -164,7 +144,7 @@ public class jsonpage extends AppCompatActivity {
             }
             progressBar1.setVisibility(View.GONE);
             Log.i("INFO", response);
-            /*
+
             //First create JSON object from the json...
             JSONObject  json = null;
             try {
@@ -192,21 +172,27 @@ public class jsonpage extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            double longVal = new Double(longitude).doubleValue();
+            double latVal = new Double(latitude).doubleValue();
 
+            String longStr = String.valueOf(longVal);
+            String latStr = String.valueOf(latVal);
+
+            lon.add(longStr);
+            lat.add(latStr);
             StringBuilder sb = new StringBuilder();
             sb.append(longitude).append(" longitude, ");
             sb.append(latitude).append(" latitude, ");
             String finalMsgText = sb.toString();
 
-             */
-            responseView1.setText(response);
+            responseView1.setText(finalMsgText);
 
         }
 
     }
     private class RetrieveFeedTask2 extends AsyncTask<Void, Void, String> {
         private Exception exception;
-        String mac2;
+        String mac2 = bssid_id.get(1);
 
         protected void onPreExecute() {
             progressBar2.setVisibility(View.VISIBLE);
@@ -243,13 +229,53 @@ public class jsonpage extends AppCompatActivity {
             }
             progressBar2.setVisibility(View.GONE);
             Log.i("INFO", response);
-            responseView2.setText(response);
+            //First create JSON object from the json...
+            JSONObject  json = null;
+            try {
+                json = new JSONObject(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            JSONObject  data = null;
+            try {
+                data = json.getJSONObject ("data");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //Then get lon and lat as string...
+            String longitude = null;
+            try {
+                longitude = data.getString("lon");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String latitude = null;
+            try {
+                latitude = data.getString("lat");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            double longVal = new Double(longitude).doubleValue();
+            double latVal = new Double(latitude).doubleValue();
+
+            String longStr = String.valueOf(longVal);
+            String latStr = String.valueOf(latVal);
+
+            lon.add(longStr);
+            lat.add(latStr);
+            StringBuilder sb = new StringBuilder();
+            sb.append(longitude).append(" longitude, ");
+            sb.append(latitude).append(" latitude, ");
+            String finalMsgText = sb.toString();
+
+            responseView2.setText(finalMsgText);
 
         }
     }
     private class RetrieveFeedTask3 extends AsyncTask<Void, Void, String> {
         private Exception exception;
-        String mac3;
+        String mac3 = bssid_id.get(2);
 
         protected void onPreExecute() {
             progressBar3.setVisibility(View.VISIBLE);
@@ -287,11 +313,60 @@ public class jsonpage extends AppCompatActivity {
             }
             progressBar3.setVisibility(View.GONE);
             Log.i("INFO", response);
-            responseView3.setText(response);
+
+            //First create JSON object from the json...
+            JSONObject  json = null;
+            try {
+                json = new JSONObject(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            JSONObject  data = null;
+            try {
+                data = json.getJSONObject ("data");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //Then get lon and lat as string...
+            String longitude = null;
+            try {
+                longitude = data.getString("lon");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String latitude = null;
+            try {
+                latitude = data.getString("lat");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            double longVal = new Double(longitude).doubleValue();
+            double latVal = new Double(latitude).doubleValue();
+
+            String longStr = String.valueOf(longVal);
+            String latStr = String.valueOf(latVal);
+
+            lon.add(longStr);
+            lat.add(latStr);
+            StringBuilder sb = new StringBuilder();
+            sb.append(longitude).append(" longitude, ");
+            sb.append(latitude).append(" latitude, ");
+            String finalMsgText = sb.toString();
+
+            responseView3.setText(finalMsgText);
         }
         }
         public void openmainpage(){
         Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+    public void openTrilat(){
+        Intent intent = new Intent(this, openTrilat.class);
+        intent.putExtra("lon", lon);
+        intent.putExtra("lat", lat);
+        intent.putExtra("sd_id", sd_id);
+        intent.putExtra("ssid_id", ssid_id);
         startActivity(intent);
     }
 }
