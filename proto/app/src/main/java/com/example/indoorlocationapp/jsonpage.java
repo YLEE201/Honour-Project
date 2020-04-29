@@ -76,7 +76,7 @@ public class jsonpage extends AppCompatActivity {
         buttonScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openmainpage();
+                    openmainpage();
 
             }
         });
@@ -84,8 +84,12 @@ public class jsonpage extends AppCompatActivity {
         User.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openTrilat();
-
+                if (lon.size() != 3){
+                    Toast.makeText(getApplicationContext(), "You need all 3 longitude", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    openTrilat();
+                }
             }
         });
         ArrayList<String> lon = null;
@@ -105,6 +109,7 @@ public class jsonpage extends AppCompatActivity {
         private Exception exception;
         String mac1 = bssid_id.get(0);
 
+
         protected void onPreExecute() {
             progressBar1.setVisibility(View.VISIBLE);
             responseView1.setText("");
@@ -114,7 +119,7 @@ public class jsonpage extends AppCompatActivity {
         protected String doInBackground(Void... urls) {
             // Do some validation here
             try {
-                String API_URL = "https://api.mylnikov.org/geolocation/wifi?v=1.1&bssid=";
+                String API_URL = "https://api.mylnikov.org/geolocation/wifi?v=1.1&data=&bssid=";
                 URL url1 = new URL(API_URL +  mac1);
                 HttpURLConnection urlConnection1 = (HttpURLConnection) url1.openConnection();
                 try {
@@ -172,6 +177,9 @@ public class jsonpage extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            Log.d("myTag", "This is my message");
+
             double longVal = new Double(longitude).doubleValue();
             double latVal = new Double(latitude).doubleValue();
 
@@ -202,7 +210,7 @@ public class jsonpage extends AppCompatActivity {
 
         protected String doInBackground(Void... urls) {
             try {
-                String API_URL = "https://api.mylnikov.org/geolocation/wifi?v=1.1&bssid=";
+                String API_URL = "https://api.mylnikov.org/geolocation/wifi?v=1.1&data=&bssid=";
                 URL url2 = new URL(API_URL + mac2);
                 HttpURLConnection urlConnection2 = (HttpURLConnection) url2.openConnection();
                 try {
@@ -285,7 +293,7 @@ public class jsonpage extends AppCompatActivity {
 
         protected String doInBackground(Void... urls) {
             try {
-                String API_URL = "https://api.mylnikov.org/geolocation/wifi?v=1.1&bssid=";
+                String API_URL = "https://api.mylnikov.org/geolocation/wifi?v=1.1&data=&bssid=";
                 URL url3 = new URL(API_URL +  mac3);
                 HttpURLConnection urlConnection3 = (HttpURLConnection) url3.openConnection();
                 try {

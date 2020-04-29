@@ -24,6 +24,14 @@
         android:background="@android:color/holo_red_light"
         android:text="@string/calculate" />
 
+    <Button
+        android:id="@+id/buttonMaps"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="15dp"
+        android:background="@android:color/holo_red_light"
+        android:text="Maps" />
     <EditText
         android:id="@+id/wifitext1"
         android:layout_width="match_parent"

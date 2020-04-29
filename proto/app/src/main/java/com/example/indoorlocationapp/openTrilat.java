@@ -19,15 +19,15 @@ public class openTrilat extends AppCompatActivity {
     private ArrayList<String> lat = new ArrayList<>();
     private ArrayList<String> ssid_id = new ArrayList<>();
     private Button buttonsend;
+    private Button buttonMaps;
     private Button getpos;
     private ArrayList<String> wifi = new ArrayList<>();
     private EditText wifitext1;
     private EditText wifitext2;
     private EditText wifitext3;
     private EditText user;
-
-
-
+    private String LatUser;
+    private String LongUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +39,8 @@ public class openTrilat extends AppCompatActivity {
         sd_id = getIntent().getStringArrayListExtra("sd_id");
         ssid_id = getIntent().getStringArrayListExtra("ssid_id");
 
-        for (int i = 0; i < 3; i++) { // Loop through every name/phone number combo
-            wifi.add("Name :" + ssid_id.get(i) + "Latitude :" + lat.get(i) + "Longitude :" + lon.get(i) +
+        for (int i = 0; i < 3; i++) { // Loop through every wifi
+            wifi.add("Name :" + ssid_id.get(i) + "\n" + "Latitude :" + lat.get(i) + "\n" + "Longitude :" + lon.get(i) + "\n" +
                     "Distance :" + sd_id.get(i) ); // Concat, and add it
         }
 
@@ -56,6 +56,8 @@ public class openTrilat extends AppCompatActivity {
 
         buttonsend = findViewById(R.id.sendBtn);
         getpos = findViewById(R.id.getPos);
+        buttonMaps = findViewById(R.id.buttonMaps);
+
 
         buttonsend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,9 +66,18 @@ public class openTrilat extends AppCompatActivity {
 
             }
         });
+
+        buttonMaps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openMappage();
+
+            }
+        });
         getpos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Trilateration Method
                 //DECLARE VARIABLES
                 double[] P1 = new double[2];
                 double[] P2 = new double[2];
@@ -111,6 +122,8 @@ public class openTrilat extends AppCompatActivity {
                 P3[1] = lonvalue3;
 
                 //TRANSFORM THE METERS VALUE FOR THE MAP UNIT
+                //Amended distance division as my the wifi AP in my area is to far apart
+                //ordinal value is 100000
                 //DISTANCE BETWEEN POINT 1 AND MY LOCATION
                 double dis1 = new Double(sd_id.get(0)).doubleValue();
                 distance1 = (dis1 / 100000);
@@ -177,10 +190,10 @@ public class openTrilat extends AppCompatActivity {
                 t3 = ey[1] * yval;
                 tripty = t1 + t2 + t3;
 
-                String xValue = String.valueOf(triptx);
-                String yValue = String.valueOf(tripty);
+                LatUser = String.valueOf(triptx);
+                LongUser = String.valueOf(tripty);
 
-                String concat = "user Latitude: " + xValue + "\n user Longitude: " + yValue;
+                String concat = "user Latitude: " + LatUser + "\n" + "user Longitude: " + LongUser;
 
                 user = findViewById(R.id.user);
                 user.setText(concat);
@@ -191,6 +204,14 @@ public class openTrilat extends AppCompatActivity {
     }
     public void openjsonpage(){
         Intent intent = new Intent(this, jsonpage.class);
+        startActivity(intent);
+    }
+    public void openMappage(){
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("lon", lon);
+        intent.putExtra("lat", lat);
+        intent.putExtra("xUser", LatUser);
+        intent.putExtra("yUser", LongUser);
         startActivity(intent);
     }
 }
