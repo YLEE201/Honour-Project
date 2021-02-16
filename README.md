@@ -56,3 +56,7 @@ Programming Language: Java
 # Demo App
 
 ![Gif](HP.gif)
+
+# Author 
+
+Yu Hong Lee
