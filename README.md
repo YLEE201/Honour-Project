@@ -49,7 +49,7 @@ Currently the app can give a rough location on google maps using Wi-Fi Signals a
 # Application Architecture
 ```
 IDE: Android Studio
-API: Google Maps API
+API: Google Maps API, Geo-Location API (https://www.mylnikov.org/archives/1170)
 Programming Language: Java
 
 ```
